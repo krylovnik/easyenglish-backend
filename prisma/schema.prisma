@@ -1,0 +1,37 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+model User {
+  id         Int         @id @default(autoincrement())
+  name       String      @unique
+  email      String      @unique
+  password   String
+  isAdmin    Boolean     @default(false)
+  favorites  Book[]
+  dictionary Dictionary?
+}
+model Book {
+  id            Int      @id @default(autoincrement())
+  title         String
+  textUrl       String
+  description   String
+  author        String
+  coverImageUlr String?  @default("uploads/coverImages/defaultCover.jpg")
+  difficulty    Int      @default(1)
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+  favorites     User[]
+}
+
+model Dictionary {
+  id          Int    @id @default(autoincrement())
+  word        String
+  translation String
+  userId      Int    @map("user_id") @unique
+  user        User   @relation(fields: [userId], references: [id])
+}
