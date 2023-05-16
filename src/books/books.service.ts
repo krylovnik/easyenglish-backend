@@ -45,4 +45,12 @@ export class BooksService {
         });
         return book?.textUrl || null;
     }
+    async getBookById(id:number) : Promise<Book | null> {
+        const book = await this.prisma.book.findUnique({
+            where: {
+                id: +id
+            }
+        });
+        return book || null;
+    }
 }

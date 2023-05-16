@@ -6,9 +6,10 @@ import { AuthModule } from './auth/auth.module';
 import {ConfigModule} from "@nestjs/config";
 import { BooksModule } from './books/books.module';
 import { DictionaryModule } from './dictionary/dictionary.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
-  imports: [ConfigModule.forRoot(), AuthModule, BooksModule, DictionaryModule],
+  imports: [ConfigModule.forRoot(), AuthModule, BooksModule, DictionaryModule, UsersModule],
   controllers: [AppController],
   providers: [AppService, PrismaService],
 })

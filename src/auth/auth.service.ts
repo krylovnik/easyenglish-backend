@@ -55,6 +55,12 @@ export class AuthService {
                 password: await hash(dto.password)
             }
         })
+        await this.prisma.userDictionary.create({
+            data: {
+                user: { connect: { id: user.id } },
+                words: {},
+            },
+        });
         const tokens = await this.giveJwtToken(user.id,user.isAdmin)
 
         return {
