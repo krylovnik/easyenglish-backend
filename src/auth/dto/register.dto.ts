@@ -1,4 +1,4 @@
-import {IsEmail, IsString, MinLength} from "class-validator";
+import {IsEmail, IsString, MaxLength, MinLength} from "class-validator";
 
 export class RegisterDto {
     @IsString()
@@ -7,7 +7,8 @@ export class RegisterDto {
     @IsEmail()
     email: string
 
-    @MinLength(6,{message: 'Password must be at least 6 characters long'})
+    @MinLength(6,{message: 'Password length should be between 6 and 20 symbols'})
+    @MaxLength(20,{message: 'Password length should be between 6 and 20 symbols'})
     @IsString()
     password: string
 }

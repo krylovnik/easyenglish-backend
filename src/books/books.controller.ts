@@ -4,9 +4,9 @@ import {
     Get,
     NotFoundException,
     Param,
-    Post,
+    Post, Put,
     Query,
-    Res,
+    Res, UploadedFile, UseInterceptors,
     UsePipes,
     ValidationPipe
 } from '@nestjs/common';
@@ -16,7 +16,21 @@ import {Book, User} from "@prisma/client";
 import {Auth} from "../auth/decorators/auth.decorator";
 import {CreateBookDto} from "./dto/book.dto";
 import {AdminOnly} from "./decorators/admin.decorator";
+import { MulterOptions } from '@nestjs/platform-express/multer/interfaces/multer-options.interface';
+import multer, { diskStorage } from 'multer';;
 import * as fs from "fs";
+import {FileInterceptor} from "@nestjs/platform-express";
+
+
+const multerOptions: MulterOptions = {
+    storage: diskStorage({
+        destination: 'uploads/coverImages',
+        filename: (req, file, callback) => {
+            const uniqueSuffix = Date.now() + Math.round(Math.random() * 1e9);
+            callback(null, uniqueSuffix + file.originalname);
+        },
+    }),
+};
 
 @Controller('books')
 export class BooksController {
@@ -30,10 +44,15 @@ export class BooksController {
         return this.booksService.getAllBooks(difficulty);
     }
 
-    @Auth()
-    @UsePipes(new ValidationPipe())
     @Post('create')
-    async createBook(@AdminOnly() user: User, @Body() createBookDto: CreateBookDto): Promise<Book> {
+    @UseInterceptors(FileInterceptor('coverImage', multerOptions))
+    async createBook(
+        @UploadedFile() coverImage: Express.Multer.File,
+        @Body() createBookDto: CreateBookDto,
+    ): Promise<Book> {
+        const coverImagePath = coverImage.destination + '/' + coverImage.filename
+        const defaultImage = coverImage.destination + '/defaultCover.jpg'
+        createBookDto.coverImageUrl = coverImage ? coverImagePath : defaultImage;
         return this.booksService.createBook(createBookDto);
     }
 
@@ -56,5 +75,22 @@ export class BooksController {
             throw new NotFoundException('Book not found');
         }
         return book
+    }
+
+    @Auth()
+    @Put(':userId/favorites/:bookId/toggle')
+    async toggleFavoriteBook(
+        @Param('userId') userId: number,
+        @Param('bookId') bookId: number,
+    ): Promise<User> {
+        return this.booksService.toggleFavoriteBook(userId, bookId);
+    }
+
+    @Auth()
+    @Get(':userId/favorites')
+    async getFavoriteBooks(
+        @Param('userId') userId: number
+    ): Promise<Book[]> {
+        return this.booksService.getFavoriteBooks(userId)
     }
 }

@@ -3,8 +3,8 @@ import {PrismaService} from "../prisma.service";
 import {RegisterDto} from "./dto/register.dto";
 import {hash, verify} from "argon2";
 import {JwtService} from "@nestjs/jwt";
-import {User} from "@prisma/client";
 import {LoginDto} from "./dto/login.dto";
+import {User} from "@prisma/client";
 
 @Injectable()
 export class AuthService {
@@ -22,7 +22,6 @@ export class AuthService {
     }
 
     async getNewTokens(dto) {
-        console.log(dto.refreshToken)
         try{
             const verifiedToken = await this.jwt.verifyAsync(dto.refreshToken)
             const user = await this.prisma.user.findUnique({
@@ -83,7 +82,8 @@ export class AuthService {
     private returnUserIdAndEmail(user: User) {
         return {
             id: user.id,
-            email: user.email
+            email: user.email,
+            isAdmin: user.isAdmin,
         }
     }
     private async validateUser( dto: RegisterDto | LoginDto) {

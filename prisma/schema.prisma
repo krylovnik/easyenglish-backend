@@ -36,7 +36,7 @@ model Book {
   textUrl       String
   description   String
   author        String
-  coverImageUlr String?  @default("uploads/coverImages/defaultCover.jpg")
+  coverImageUrl String?  @default("uploads/coverImages/defaultCover.jpg")
   difficulty    Int      @default(1)
   createdAt     DateTime @default(now()) @map("created_at")
   updatedAt     DateTime @updatedAt @map("updated_at")
